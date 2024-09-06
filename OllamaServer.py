@@ -7,8 +7,13 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.llms import Ollama
+from transformers import pipeline
+
 
 app = FastAPI()
+
+# Initialize the summarizer
+summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 
 # Global variables to store the document data and QA chain
 qa_chain = None
@@ -41,7 +46,7 @@ def load_document(document: DocumentInput):
     vector_store = FAISS.from_texts(chunks, embeddings)  # Updated to directly create a vector store from chunks of text
     
     # Set up the RAG pipeline with Ollama
-    llm = Ollama(model="llama2")
+    llm = Ollama(model="llama3")
     retriever = vector_store.as_retriever()
     qa_chain = RetrievalQA.from_chain_type(llm, retriever=retriever)
     
@@ -67,5 +72,25 @@ def query_document(query: QueryInput):
     
     response = qa_chain({"query": query.question})
     return {"answer": response['result']}
+
+@app.post("/summarize")
+def summarize_document(document: DocumentInput):
+    """Summarize the document content."""
+    content = document.content
+
+    # Split the document into manageable chunks
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
+    chunks = text_splitter.split_text(content)
+
+    # Summarize each chunk individually
+    summaries = []
+    for chunk in chunks:
+        summary = summarizer(chunk, max_length=130, min_length=30, do_sample=False)
+        summaries.append(summary[0]['summary_text'])
+
+    # Combine the chunk summaries into a single summary
+    combined_summary = " ".join(summaries)
+
+    return {"summary": combined_summary}
 
 # To run the server, use: `uvicorn OllamaServer:app --host 0.0.0.0 --port 8000`

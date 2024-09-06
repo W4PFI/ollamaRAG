@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Set server address from environment variable or use localhost as default
+OLLAMA_SERVER_ADDRESS=${OLLAMA_SERVER_ADDRESS:-localhost}
+OLLAMA_PORT=${OLLAMA_PORT:-8000}
+
 # Function to print text in green
 print_green() {
   echo -e "\033[0;32m$1\033[0m"
@@ -26,7 +30,7 @@ if [ "$1" == "-interactive" ]; then
     fi
 
     # Send the question to the FastAPI server
-    RESPONSE=$(curl -s -X POST "http://localhost:8000/query" -H "Content-Type: application/json" -d "{\"question\": \"$QUESTION\"}")
+    RESPONSE=$(curl -s -X POST "http://$OLLAMA_SERVER_ADDRESS:$OLLAMA_PORT/query" -H "Content-Type: application/json" -d "{\"question\": \"$QUESTION\"}")
 
     # Extract the answer from the JSON response using jq
     ANSWER=$(echo "$RESPONSE" | jq -r '.answer')
@@ -50,7 +54,7 @@ else
   QUESTION="$*"
 
   # Use curl to send a POST request to query the content from the FastAPI server
-  RESPONSE=$(curl -s -X POST "http://localhost:8000/query" -H "Content-Type: application/json" -d "{\"question\": \"$QUESTION\"}")
+  RESPONSE=$(curl -s -X POST "http://$OLLAMA_SERVER_ADDRESS:$OLLAMA_PORT/query" -H "Content-Type: application/json" -d "{\"question\": \"$QUESTION\"}")
 
   # Extract the answer from the JSON response using jq
   ANSWER=$(echo "$RESPONSE" | jq -r '.answer')

@@ -6,7 +6,7 @@ OLLAMA_PORT=${OLLAMA_PORT:-8000}
 
 # Check if a filename is provided as an argument
 if [ -z "$1" ]; then
-  echo "Usage: ./addDoc.sh <filename>"
+  echo "Usage: ./summary.sh <filename>"
   exit 1
 fi
 
@@ -23,7 +23,7 @@ fi
 FILE_CONTENT=$(<"$FILENAME")
 ESCAPED_CONTENT=$(jq -Rsa <<< "$FILE_CONTENT")
 
-# Use curl to send a POST request to load the document content into the FastAPI server
-curl -X POST "http://$OLLAMA_SERVER_ADDRESS:$OLLAMA_PORT/load" -H "Content-Type: application/json" -d "{\"content\": $ESCAPED_CONTENT}"
+# Use curl to send a POST request to summarize the document content via the FastAPI server
+curl -X POST "http://$OLLAMA_SERVER_ADDRESS:$OLLAMA_PORT/summarize" -H "Content-Type: application/json" -d "{\"content\": $ESCAPED_CONTENT}"
 
-echo -e "\nDocument loaded from file: $FILENAME"
+echo -e "\nSummary of the file: $FILENAME"
