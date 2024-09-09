@@ -48,8 +48,8 @@ echo -e "\nSummary of the file: $FILENAME"
 echo -e "$SUMMARY"
 
 # Optionally, write the summary to a text file (change extension as needed)
-SUMMARY_FILENAME="${FILENAME%.txt}_summary.txt"
-echo -e "$SUMMARY" > "$SUMMARY_FILENAME"
+#SUMMARY_FILENAME="${FILENAME%.txt}_summary.txt"
+#echo -e "$SUMMARY" > "$SUMMARY_FILENAME"
 
 # Inform the user that the summary was saved
-echo "Summary saved to: $SUMMARY_FILENAME"
+#echo "Summary saved to: $SUMMARY_FILENAME"
